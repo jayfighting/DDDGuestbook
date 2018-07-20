@@ -7,9 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.API.Controllers
 {
-    [Produces("application/json")]
     [Route("api/[controller]")]
-    public class TodoController : Controller
+    public class TodoController : ControllerBase
     {
+        public TodoController()
+        {
+        }
+        [HttpGet]
+        public ActionResult GetAll()
+        {
+            return Ok("OK");
+        }
+
     }
 }

@@ -9,9 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B7D81101-D71
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.Core", "CleanArchitecture.Core\CleanArchitecture.Core.csproj", "{08E7B27D-61C6-4950-9CE3-3053562ABF73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanArchitecture.Infrastructure", "CleanArchitecture.Infrastructure\CleanArchitecture.Infrastructure.csproj", "{E5945105-D24B-41C3-B69A-C21287D953AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.Infrastructure", "CleanArchitecture.Infrastructure\CleanArchitecture.Infrastructure.csproj", "{E5945105-D24B-41C3-B69A-C21287D953AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanArchitecture.API", "CleanArchitecture.API\CleanArchitecture.API.csproj", "{A9E84C3C-C8EA-4E0D-8AF5-CDB4824228C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.API", "CleanArchitecture.API\CleanArchitecture.API.csproj", "{A9E84C3C-C8EA-4E0D-8AF5-CDB4824228C3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0219A57C-0421-4160-9CFF-9270E8E09967}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{08E7B27D-61C6-4950-9CE3-3053562ABF73} = {B7D81101-D718-475C-ADC6-76E7FCC0A277}
 		{E5945105-D24B-41C3-B69A-C21287D953AF} = {B7D81101-D718-475C-ADC6-76E7FCC0A277}
+		{A9E84C3C-C8EA-4E0D-8AF5-CDB4824228C3} = {B7D81101-D718-475C-ADC6-76E7FCC0A277}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B3448B31-EFBB-4450-A1CF-5325BF4D3ABD}
