@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Infrastructure.Data
@@ -14,6 +15,10 @@ namespace CleanArchitecture.Infrastructure.Data
         {
             _dispatcher = dispatcher;
         }
+
+        public DbSet<Guestbook> Guestbooks { get; set; }
+        public DbSet<GuestbookEntry> GuestbookEntries { get; set; }
+        public DbSet<ToDoItem> ToDoItems { get; set; }
 
         public override int SaveChanges()
         {
