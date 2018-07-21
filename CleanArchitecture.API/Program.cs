@@ -20,6 +20,7 @@ namespace CleanArchitecture.API
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseEnvironment("Testing")
                 .Build();
     }
 }
