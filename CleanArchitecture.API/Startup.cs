@@ -85,6 +85,7 @@ namespace CleanArchitecture.API
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            loggerFactory.AddFile("Logs/myapp-{Date}.txt");
 
             if (env.IsDevelopment())
             {
