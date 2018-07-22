@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace CleanArchitecture.API.Controllers
 {
     [Route("api/[controller]")]
-    [ValidateModel]
     [VerifyGuestbookExists]
-    public class GuestbookController : Controller
+    [ApiController]
+    public class GuestbookController : ControllerBase
     {
         private readonly IRepository<Guestbook> _guestbookRepository;
 
