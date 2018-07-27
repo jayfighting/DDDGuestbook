@@ -37,6 +37,8 @@ namespace CleanArchitecture.API
                 EmailAddress = "test@test.com",
                 Message = "Test message"
             });
+
+            
             dbContext.SaveChanges();
         }
 

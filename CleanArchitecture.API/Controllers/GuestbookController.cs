@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace CleanArchitecture.API.Controllers
 {
     [Route("api/[controller]")]
-    [VerifyGuestbookExists]
     [ApiController]
     public class GuestbookController : ControllerBase
     {
