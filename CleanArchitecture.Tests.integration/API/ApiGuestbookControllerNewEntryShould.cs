@@ -1,13 +1,12 @@
-﻿using CleanArchitecture.Core.Entities;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using CleanArchitecture.Tests.Integration.API;
+using CleanArchitecture.Core.Entities;
+using Newtonsoft.Json;
 using Xunit;
 
-namespace CleanArchitecture.Tests.Integration.Web
+namespace CleanArchitecture.Tests.Integration.API
 {
     public class ApiGuestbookControllerNewEntryShould : BaseWebTest
     {

@@ -8,6 +8,7 @@ using CleanArchitecture.API.Models;
 
 namespace CleanArchitecture.Web.Api
 {
+    [ApiController]
     [Route("api/[controller]")]
     [ValidateModel]
     public class ToDoItemsController : Controller
@@ -37,6 +38,7 @@ namespace CleanArchitecture.Web.Api
         }
 
         // POST: api/ToDoItems
+        [HttpPost]
         public async Task<IActionResult> Post([FromBody] ToDoItemDTO item)
         {
             var todoItem = new ToDoItem()

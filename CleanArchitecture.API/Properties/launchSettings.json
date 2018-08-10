@@ -19,7 +19,6 @@
     "CleanArchitecture.API": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/todo",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
