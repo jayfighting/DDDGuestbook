@@ -1,12 +1,13 @@
 ﻿using System;
-using CleanArchitecture.Core.Entities;
-using CleanArchitecture.Core.Interfaces;
-using CleanArchitecture.Core.SharedKernel;
+using System.Text;
+using AutoMapper;
+using CleanArchitecture.API.Extensions;
+using CleanArchitecture.API.Helpers;
 using CleanArchitecture.Infrastructure.Data;
-using CleanArchitecture.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -30,12 +31,23 @@ namespace CleanArchitecture.API
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             // TODO: Add DbContext and IOC
-            string dbName = Guid.NewGuid().ToString();
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseInMemoryDatabase(dbName));
-            //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("DefaultConnection"));
+            //services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
+            services.ConfigureCors();
             services.AddMvc().AddControllersAsServices().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddAutoMapper();
+
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+            // configure jwt authentication
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+            services.ConfigureJwt(key);
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -51,30 +63,7 @@ namespace CleanArchitecture.API
             });
 
             var container = new Container();
-
-            container.Configure(config =>
-            {
-                config.Scan(_ =>
-                {
-                    _.AssemblyContainingType(typeof(Startup)); // Web
-                    _.AssemblyContainingType(typeof(BaseEntity)); // Core
-                    _.Assembly("CleanArchitecture.Infrastructure"); // Infrastructure
-                    _.WithDefaultConventions();
-                    _.ConnectImplementationsToTypesClosing(typeof(IHandle<>));
-                });
-
-                config.For<IRepository<Guestbook>>().Use<GuestbookRepository>();
-                config.For<IMessageSender>().Use<EmailMessageSenderService>();
-
-                // TODO: Add Registry Classes to eliminate reference to Infrastructure
-
-                // TODO: Move to Infrastucture Registry
-                config.For(typeof(IRepository<>)).Add(typeof(EfRepository<>));
-
-                //Populate the container using the service collection
-                config.Populate(services);
-            });
-
+            container.ConfigureContainer(services);
             return container.GetInstance<IServiceProvider>();
         }
 
@@ -117,6 +106,10 @@ namespace CleanArchitecture.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
+
+            app.UseCors();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

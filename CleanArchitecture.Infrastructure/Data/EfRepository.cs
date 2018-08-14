@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace CleanArchitecture.Infrastructure.Data
 {
-    public class EfRepository<T> : IRepository<T> where T : BaseEntity
+    public class EfRepository<T> : IRepository<T> where T : BaseEntity<int>
     {
         protected readonly AppDbContext _dbContext;
 

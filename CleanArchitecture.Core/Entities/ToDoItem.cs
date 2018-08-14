@@ -3,7 +3,7 @@ using CleanArchitecture.Core.SharedKernel;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class ToDoItem : BaseEntity
+    public class ToDoItem : BaseEntity<int>
     {
         public string Title { get; set; } 
         public string Description { get; set; }

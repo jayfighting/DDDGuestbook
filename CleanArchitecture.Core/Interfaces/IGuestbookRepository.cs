@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Helpers;
 
 namespace CleanArchitecture.Core.Interfaces
 {

@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27703.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BFC0580B-4BBA-4687-BD14-2E4F5D1A292F}"
+	ProjectSection(SolutionItems) = preProject
+		ASPNetIdentityReadMe.txt = ASPNetIdentityReadMe.txt
+		ReadMe.txt = ReadMe.txt
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B7D81101-D718-475C-ADC6-76E7FCC0A277}"
 EndProject
@@ -15,9 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.API", "Cl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0219A57C-0421-4160-9CFF-9270E8E09967}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanArchitecture.Tests", "CleanArchitecture.Tests\CleanArchitecture.Tests.csproj", "{F0D2B04D-E252-4648-9FA7-B9D3236B2717}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.Tests", "CleanArchitecture.Tests\CleanArchitecture.Tests.csproj", "{F0D2B04D-E252-4648-9FA7-B9D3236B2717}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanArchitecture.Tests.integration", "CleanArchitecture.Tests.integration\CleanArchitecture.Tests.integration.csproj", "{B841DDA5-797D-4C3F-B43A-D41E3960CABF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.Tests.integration", "CleanArchitecture.Tests.integration\CleanArchitecture.Tests.integration.csproj", "{B841DDA5-797D-4C3F-B43A-D41E3960CABF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
