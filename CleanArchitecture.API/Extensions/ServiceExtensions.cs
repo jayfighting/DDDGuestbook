@@ -3,6 +3,8 @@ using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Infrastructure.Data;
+using CleanArchitecture.Infrastructure.DomainEvents;
+using CleanArchitecture.Infrastructure.Logging;
 using CleanArchitecture.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,7 +84,9 @@ namespace CleanArchitecture.API.Extensions
 
                 config.For<IRepository<Guestbook>>().Use<GuestbookRepository>();
                 config.For<IMessageSender>().Use<EmailMessageSenderService>();
-
+                config.For<IDomainEventDispatcher>().Use<DomainEventDispatcher>();
+                config.For(typeof(IAppLogger<>)).Use(typeof(LoggerAdapter<>));
+                //services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
                 // TODO: Add Registry Classes to eliminate reference to Infrastructure
 
                 // TODO: Move to Infrastucture Registry

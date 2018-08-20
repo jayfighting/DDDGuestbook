@@ -11,6 +11,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using CleanArchitecture.API;
+using Microsoft.Extensions.Configuration;
 
 namespace CleanArchitecture.Tests.Integration.API
 {
@@ -28,9 +29,13 @@ namespace CleanArchitecture.Tests.Integration.API
             var startupAssembly = typeof(Startup).GetTypeInfo().Assembly;
             var contentRoot = GetProjectPath("src", startupAssembly);
             var builder = new WebHostBuilder()
-                //.UseContentRoot(contentRoot)
-                .ConfigureServices(InitializeServices)
+                .UseContentRoot(contentRoot)
+                .ConfigureTestServices(InitializeServices)
                 .UseStartup<Startup>()
+                .UseConfiguration(new ConfigurationBuilder()
+                    .SetBasePath(contentRoot)
+                    .AddJsonFile("appsettings.json")
+                    .Build())
                 .UseEnvironment("Testing"); // ensure ConfigureTesting is called in Startup
 
             var server = new TestServer(builder);
@@ -78,7 +83,7 @@ namespace CleanArchitecture.Tests.Integration.API
                 var solutionFileInfo = new FileInfo(Path.Combine(directoryInfo.FullName, "DDDGuestbook.sln"));
                 if (solutionFileInfo.Exists)
                 {
-                    return Path.GetFullPath(Path.Combine(directoryInfo.FullName, solutionRelativePath, projectName));
+                    return Path.GetFullPath(Path.Combine(directoryInfo.FullName, projectName));
                 }
 
                 directoryInfo = directoryInfo.Parent;

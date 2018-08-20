@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using CleanArchitecture.API.Helpers;
 using CleanArchitecture.API.Models;
+using CleanArchitecture.API.ViewModels;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +20,18 @@ namespace CleanArchitecture.API.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
         private readonly AppSettings _appSettings;
+        //private readonly IAppLogger<AccountController> _logger;
 
         public AccountController(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration,
             IOptions<AppSettings> appSettings
         )
@@ -37,13 +40,14 @@ namespace CleanArchitecture.API.Controllers
             _signInManager = signInManager;
             _configuration = configuration;
             _appSettings = appSettings.Value;
+            //_logger = logger;
         }
 
         [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto model)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email
@@ -56,10 +60,33 @@ namespace CleanArchitecture.API.Controllers
                 return await GenerateJwtToken(model.Email, user);
             }
 
-            throw new ApplicationException("UNKNOWN_ERROR");
+            throw new ApplicationException(result.Errors.ToString());
         }
 
-        [Authorize]
+        [AllowAnonymous]
+        [HttpPost("SignIn")]
+        public async Task<IActionResult> SginIn(LoginViewModel model)
+        {
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+            if (result.RequiresTwoFactor)
+            {
+                //return RedirectToAction(nameof(LoginWith2fa), new { returnUrl, model.RememberMe });
+            }
+            if (result.Succeeded)
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email
+                };
+
+                return await GenerateJwtToken(model.Email, user);
+            }
+
+            throw new ApplicationException();
+        }
+
+        //[Authorize]
         [HttpGet("Protected")]
         public async Task<object> Protected()
         {
@@ -74,7 +101,7 @@ namespace CleanArchitecture.API.Controllers
             return Ok("Logout");
         }
 
-        private async Task<IActionResult> GenerateJwtToken(string email, IdentityUser user)
+        private async Task<IActionResult> GenerateJwtToken(string email, ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
