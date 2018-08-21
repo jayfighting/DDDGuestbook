@@ -85,11 +85,12 @@ namespace CleanArchitecture.API.Extensions
                 config.For<IRepository<Guestbook>>().Use<GuestbookRepository>();
                 config.For<IMessageSender>().Use<EmailMessageSenderService>();
                 config.For<IDomainEventDispatcher>().Use<DomainEventDispatcher>();
-                config.For(typeof(IAppLogger<>)).Use(typeof(LoggerAdapter<>));
+                
                 //services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
                 // TODO: Add Registry Classes to eliminate reference to Infrastructure
 
                 // TODO: Move to Infrastucture Registry
+                config.For(typeof(IAppLogger<>)).Add(typeof(LoggerAdapter<>));
                 config.For(typeof(IRepository<>)).Add(typeof(EfRepository<>));
 
                 //Populate the container using the service collection

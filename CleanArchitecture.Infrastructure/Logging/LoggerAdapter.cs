@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CleanArchitecture.Core.Interfaces;
+﻿using CleanArchitecture.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Infrastructure.Logging

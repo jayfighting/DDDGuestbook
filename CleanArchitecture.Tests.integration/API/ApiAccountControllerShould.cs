@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using CleanArchitecture.API.ViewModels;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Infrastructure.Identity;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -31,19 +32,40 @@ namespace CleanArchitecture.Tests.Integration.API
         }
 
         [Fact]
-        public void CanGet()
+        public void CanSignInWithTestAccount()
         {
+            var signInViewModel = new LoginViewModel()
+            {
+                Email = "test@loandepot.com",
+                Password = "Testing@123",
+                RememberMe = true
+            };
 
-            var response = _client.GetAsync($"/api/account/Protected").Result;
-            var stringResponse = response.Content.ReadAsStringAsync().Result;
+            var jsonContent = new StringContent(JsonConvert.SerializeObject(signInViewModel), Encoding.UTF8,
+                "application/json");
 
-            //Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.NotNull(stringResponse);
+            var response = _client.PostAsync("/api/account/SignIn", jsonContent).Result;
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]
-        public void Return404GivenInvalidId()
+        public void CanSignOut()
         {
+            var response = _client.GetAsync("/api/account/SignOut").Result;
+        
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public void CanGenerateJwtToken()
+        {
+            //var appUser = new ApplicationUser()
+            //{
+
+            //}
+                
+
             string invalidId = "100";
             var response = _client.GetAsync($"/api/guestbook/{invalidId}").Result;
 

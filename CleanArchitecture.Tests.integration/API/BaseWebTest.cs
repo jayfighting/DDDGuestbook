@@ -11,7 +11,10 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using CleanArchitecture.API;
+using CleanArchitecture.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Tests.Integration.API
 {
@@ -39,9 +42,24 @@ namespace CleanArchitecture.Tests.Integration.API
                 .UseEnvironment("Testing"); // ensure ConfigureTesting is called in Startup
 
             var server = new TestServer(builder);
-            var client = server.CreateClient();
+         
+            using (var scope = server.Host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+                try
+                {
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                    AppIdentityDbContextSeed.SeedAsync(userManager).Wait();
+                }
+                catch (Exception ex)
+                {
+                    var logger = loggerFactory.CreateLogger<Program>();
+                    logger.LogError(ex, "An error occurred seeding the DB.");
+                }
+            }
 
-            return client;
+            return server.CreateClient();
         }
 
         protected virtual void InitializeServices(IServiceCollection services)

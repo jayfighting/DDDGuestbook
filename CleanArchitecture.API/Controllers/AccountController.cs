@@ -27,20 +27,21 @@ namespace CleanArchitecture.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
         private readonly AppSettings _appSettings;
-        //private readonly IAppLogger<AccountController> _logger;
+        private readonly IAppLogger<AccountController> _logger;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration,
-            IOptions<AppSettings> appSettings
+            IOptions<AppSettings> appSettings,
+            IAppLogger<AccountController> logger
         )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _appSettings = appSettings.Value;
-            //_logger = logger;
+            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -57,7 +58,7 @@ namespace CleanArchitecture.API.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, false);
-                return await GenerateJwtToken(model.Email, user);
+                return await GenerateJwtToken(user);
             }
 
             throw new ApplicationException(result.Errors.ToString());
@@ -65,7 +66,7 @@ namespace CleanArchitecture.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("SignIn")]
-        public async Task<IActionResult> SginIn(LoginViewModel model)
+        public async Task<IActionResult> SignIn(LoginViewModel model)
         {
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
             if (result.RequiresTwoFactor)
@@ -80,7 +81,7 @@ namespace CleanArchitecture.API.Controllers
                     Email = model.Email
                 };
 
-                return await GenerateJwtToken(model.Email, user);
+                return await GenerateJwtToken(user);
             }
 
             throw new ApplicationException();
@@ -94,14 +95,14 @@ namespace CleanArchitecture.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("Logout")]
-        public async Task<object> Logout()
+        [HttpGet("SignOut")]
+        public async Task<object> SignOut()
         {
             await _signInManager.SignOutAsync();
             return Ok("Logout");
         }
 
-        private async Task<IActionResult> GenerateJwtToken(string email, ApplicationUser user)
+        private async Task<IActionResult> GenerateJwtToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
