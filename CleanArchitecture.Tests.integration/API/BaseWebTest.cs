@@ -1,12 +1,4 @@
-﻿using CleanArchitecture.Web;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.ViewComponents;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.PlatformAbstractions;
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
@@ -15,6 +7,14 @@ using CleanArchitecture.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StructureMap.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace CleanArchitecture.Tests.Integration.API
 {
@@ -35,11 +35,12 @@ namespace CleanArchitecture.Tests.Integration.API
                 .UseContentRoot(contentRoot)
                 .ConfigureTestServices(InitializeServices)
                 .UseStartup<Startup>()
+                .UseEnvironment("Testing")
+                .UseStructureMap()
                 .UseConfiguration(new ConfigurationBuilder()
                     .SetBasePath(contentRoot)
                     .AddJsonFile("appsettings.json")
-                    .Build())
-                .UseEnvironment("Testing"); // ensure ConfigureTesting is called in Startup
+                    .Build());
 
             var server = new TestServer(builder);
          

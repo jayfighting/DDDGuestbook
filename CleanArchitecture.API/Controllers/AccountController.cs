@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CleanArchitecture.API.Helpers;
 using CleanArchitecture.API.Models;
 using CleanArchitecture.API.ViewModels;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,7 @@ namespace CleanArchitecture.API.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IRepository<Guestbook> _repo;
         private readonly AppSettings _appSettings;
         private readonly IAppLogger<AccountController> _logger;
 
@@ -40,8 +42,9 @@ namespace CleanArchitecture.API.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
-            _appSettings = appSettings.Value;
             _logger = logger;
+            _appSettings = appSettings.Value;
+            //_logger = logger;
         }
 
         [AllowAnonymous]

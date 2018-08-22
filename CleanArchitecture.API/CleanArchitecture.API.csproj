@@ -15,7 +15,8 @@
   <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0-dev-00024" />
-    <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="1.2.0" />
+    <PackageReference Include="StructureMap.AspNetCore" Version="1.4.0" />
+    <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="1.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
   </ItemGroup>
 

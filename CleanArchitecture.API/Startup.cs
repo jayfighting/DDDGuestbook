@@ -3,14 +3,17 @@ using System.Text;
 using AutoMapper;
 using CleanArchitecture.API.Extensions;
 using CleanArchitecture.API.Helpers;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.SharedKernel;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Infrastructure.DomainEvents;
 using CleanArchitecture.Infrastructure.Identity;
+using CleanArchitecture.Infrastructure.Logging;
+using CleanArchitecture.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -25,7 +28,6 @@ namespace CleanArchitecture.API
     public class Startup
     {
         private IServiceCollection _services;
-        private IContainer _container;
 
         public Startup(IConfiguration configuration)
         {
@@ -36,31 +38,12 @@ namespace CleanArchitecture.API
 
         public void ConfigureTestingServices(IServiceCollection services)
         {
-            var container = new Container();
-            // use in-memory database
-            services.AddDbContext<AppDbContext>(c => c.UseInMemoryDatabase("Catalog"));
-
-            // Add Identity DbContext
-            services.AddDbContext<AppIdentityDbContext>(options => options.UseInMemoryDatabase("Identity"));
-
-            ConfigureServices(services);
-
-            container.ConfigureContainer(services);
-            _container = container;
-            //return container.GetInstance<IServiceProvider>();
-        }
-
-        public void ConfigureProductionServices(IServiceCollection services)
-        {
-            var container = new Container();
-
             //services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("DefaultConnection"));
             // conifg to throw if query is being executed on the client, could be inefficent
             // .UseLazyLoadingProxies() for lazy loading
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-                options.UseLoggerFactory(container.GetInstance<ILoggerFactory>());
                 options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
             });
 
@@ -68,20 +51,48 @@ namespace CleanArchitecture.API
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
                 options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
-                options.UseLoggerFactory(container.GetInstance<ILoggerFactory>());
             });
 
             ConfigureServices(services);
-
-            container.ConfigureContainer(services);
-            _container = container;
-            //return container.GetInstance<IServiceProvider>();
         }
 
+        public void ConfigureProductionServices(IServiceCollection services)
+        {
+
+            services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("DefaultConnection"));
+             //conifg to throw if query is being executed on the client, could be inefficent
+             //.UseLazyLoadingProxies() for lazy loading
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                //options.UseLoggerFactory(container.GetInstance<ILoggerFactory>());
+                options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
+            });
+
+            services.AddDbContext<AppIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
+                //options.UseLoggerFactory(container.GetInstance<ILoggerFactory>());
+            });
+
+            ConfigureServices(services);
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
+            });
+
+            services.AddDbContext<AppIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
+            });
 
             services.AddLogging();
             /* TODO passing in role, and default token provider services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -134,15 +145,25 @@ namespace CleanArchitecture.API
             _services = services;
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void ConfigureTesting(IApplicationBuilder app,
-            IHostingEnvironment env,
-            ILoggerFactory loggerFactory)
+        public void ConfigureContainer(Registry registry)
         {
-            this.Configure(app, env, loggerFactory);
-            SeedData.PopulateTestData(_container.GetInstance<AppDbContext>());
-            ListAllRegisteredServices(app);
-            app.UseDatabaseErrorPage();
+            registry.Scan(_ => 
+            {
+                _.AssemblyContainingType(typeof(Startup)); // Web
+                _.AssemblyContainingType(typeof(BaseEntity<int>)); // Core
+                _.AssemblyContainingType(typeof(BaseEntity<string>)); // Core
+                _.Assembly("CleanArchitecture.Infrastructure"); // Infrastructure
+                _.WithDefaultConventions();
+                _.ConnectImplementationsToTypesClosing(typeof(IHandle<>));
+            });
+
+            registry.For<IRepository<Guestbook>>().Use<GuestbookRepository>();
+            registry.For<IMessageSender>().Use<EmailMessageSenderService>();
+            registry.For<IDomainEventDispatcher>().Use<DomainEventDispatcher>();
+
+            registry.For(typeof(IAppLogger<>)).Add(typeof(LoggerAdapter<>));
+            registry.For(typeof(IRepository<>)).Add(typeof(EfRepository<>));
+
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
