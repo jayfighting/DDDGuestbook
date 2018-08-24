@@ -20,6 +20,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using StructureMap;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -35,49 +37,6 @@ namespace CleanArchitecture.API
         }
 
         public IConfiguration Configuration { get; }
-
-        public void ConfigureTestingServices(IServiceCollection services)
-        {
-            //services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("DefaultConnection"));
-            // conifg to throw if query is being executed on the client, could be inefficent
-            // .UseLazyLoadingProxies() for lazy loading
-            services.AddDbContext<AppDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-                options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
-            });
-
-            services.AddDbContext<AppIdentityDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-                options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
-            });
-
-            ConfigureServices(services);
-        }
-
-        public void ConfigureProductionServices(IServiceCollection services)
-        {
-
-            services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("DefaultConnection"));
-             //conifg to throw if query is being executed on the client, could be inefficent
-             //.UseLazyLoadingProxies() for lazy loading
-            services.AddDbContext<AppDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-                //options.UseLoggerFactory(container.GetInstance<ILoggerFactory>());
-                options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
-            });
-
-            services.AddDbContext<AppIdentityDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-                options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
-                //options.UseLoggerFactory(container.GetInstance<ILoggerFactory>());
-            });
-
-            ConfigureServices(services);
-        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -139,7 +98,12 @@ namespace CleanArchitecture.API
             services.AddMemoryCache();
 
             services.ConfigureCors();
-            services.AddMvc().AddControllersAsServices().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().AddControllersAsServices().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                });
             services.AddAutoMapper();
 
             _services = services;
@@ -147,7 +111,7 @@ namespace CleanArchitecture.API
 
         public void ConfigureContainer(Registry registry)
         {
-            registry.Scan(_ => 
+            registry.Scan(_ =>
             {
                 _.AssemblyContainingType(typeof(Startup)); // Web
                 _.AssemblyContainingType(typeof(BaseEntity<int>)); // Core

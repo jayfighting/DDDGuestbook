@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using CleanArchitecture.API.Helpers;
 using CleanArchitecture.API.Models;
 using CleanArchitecture.API.ViewModels;
@@ -11,11 +14,13 @@ using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
 
 namespace CleanArchitecture.API.Controllers
 {
@@ -90,11 +95,25 @@ namespace CleanArchitecture.API.Controllers
             throw new ApplicationException();
         }
 
-        //[Authorize]
-        [HttpGet("Protected")]
-        public async Task<object> Protected()
+        [Authorize]
+        [HttpPost("AddClaim")]
+        public async Task<object> AddClaims(IEnumerable<ClaimViewModel> claims)
         {
-            return "Protected area";
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            foreach (var claimViewModel in claims)
+            {
+                await _userManager.AddClaimAsync(user, new Claim(claimViewModel.Type, claimViewModel.Value));
+            }
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("ListClaims")]
+        public async Task<object> GetClaims()
+        {
+            return Ok(HttpContext.User.Claims);
         }
 
         [Authorize]

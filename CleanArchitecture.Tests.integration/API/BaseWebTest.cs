@@ -35,7 +35,6 @@ namespace CleanArchitecture.Tests.Integration.API
                 .UseContentRoot(contentRoot)
                 .ConfigureTestServices(InitializeServices)
                 .UseStartup<Startup>()
-                .UseEnvironment("Testing")
                 .UseStructureMap()
                 .UseConfiguration(new ConfigurationBuilder()
                     .SetBasePath(contentRoot)

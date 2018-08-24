@@ -56,6 +56,14 @@ namespace CleanArchitecture.Tests.Integration.API
         
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
+        
+        [Fact]
+        public void CanAddClaims()
+        {
+            var response = _client.GetAsync("/api/account/ListClaims").Result;
+        
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
 
         [Fact]
         public void CanGenerateJwtToken()

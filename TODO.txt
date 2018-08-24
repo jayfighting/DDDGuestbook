@@ -1,0 +1,2 @@
+1. Need better way of handling exception, error code, error message
+2. 
